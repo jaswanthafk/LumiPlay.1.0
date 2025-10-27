@@ -42,7 +42,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/movies/:id" element={<MoviePage />} />
-          <Route path="/tvshows" element={<TVShows />} />
+          <Route path="/tvshows" element={<TvShows />} />
           <Route path="/tv/:id" element={<TVPage />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/login" element={<Login />} />
