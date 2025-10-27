@@ -6,7 +6,7 @@ import MoviePage from "./pages/MoviePage.jsx";
 import { useState } from "react";
 import { useEffect } from "react";
 import Movies from "./pages/Movies";
-import TVShows from "./pages/TvShows";
+import TvShows from "./pages/TvShows";
 import TVPage from "./pages/TVPage.jsx";
 import SearchResults from "./pages/SearchResults.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
