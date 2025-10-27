@@ -18,6 +18,8 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import Watchlist from "./pages/Watchlist.jsx";
 import Footer from "./components/Footer.jsx";
 import AdWarning from "./components/AdWarning.jsx";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -58,6 +60,21 @@ export default function App() {
             }
           />
         </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="dark"
+          toastStyle={{
+            background: "#111827", // dark gray
+            color: "#fff",
+            borderRadius: "10px",
+          }}
+        />
       </AuthProvider>
       <Footer />
     </div>

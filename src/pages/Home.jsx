@@ -8,7 +8,8 @@ import Recommendations from "../components/Recommendations";
 import { fetchWithCache } from "../utils/fetchWithCache";
 import { getWatchlist } from "../utils/watchlist";
 import { FiPlay, FiPause, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import './Home.css'
+import "./Home.css";
+import SearchContainer from "../components/SearchContainer";
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
 export default function Home() {
@@ -70,6 +71,10 @@ export default function Home() {
   };
 
   const currentMovie = heroMovies[currentHero];
+  <div className="w-full sm:w-[80%] md:w-[60%] lg:w-[50%] bg-gray-900/70 backdrop-blur-md p-3 rounded-full flex items-center shadow-lg">
+    {/* search input and icon */}
+    <SearchContainer />
+  </div>;
 
   // Load previous watches from localStorage
   useEffect(() => {
@@ -154,24 +159,28 @@ export default function Home() {
           </div>
         </section>
       )}
-
+      <div className="flex justify-center mt-6 sm:mt-10 px-4">
+        <div className="w-full sm:w-[80%] md:w-[60%] lg:w-[50%]">
+          <SearchContainer />
+        </div>
+      </div>
       {/* WATCHLIST */}
       {user && watchlist.length > 0 && (
         <div className="mt-8 sm:mt-10">
           <MovieRow title="Your Watchlist ❤️" customList={watchlist} />
         </div>
       )}
-
       {/* PREVIOUS WATCHES */}
       {user && previousWatches.length > 0 && (
         <div className="mt-6 sm:mt-8">
-          <MovieRow title="Your Previous Watches" customList={previousWatches} />
+          <MovieRow
+            title="Your Previous Watches"
+            customList={previousWatches}
+          />
         </div>
       )}
-
       {/* RECOMMENDATIONS (component handles its own fetching/caching) */}
       <Recommendations />
-
       {/* STANDARD TMDB ROWS */}
       <MovieRow title="Popular on LumiPlay" endpoint="/movie/popular" />
       <MovieRow title="Top Rated" endpoint="/movie/top_rated" />

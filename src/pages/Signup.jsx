@@ -8,6 +8,7 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -25,18 +26,30 @@ export default function Signup() {
       const res = await createUserWithEmailAndPassword(auth, email, password);
       const user = res.user;
 
-      await updateProfile(user, { displayName: username });
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email,
-        username,
+      await Promise.all([
+        setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email,
+          username,
+          theme: "dark",
+        }),
+        updateProfile(user, { displayName: username }).catch(() => {}),
+      ]);
+
+      toast.success("Account created successfully! 🎉", {
+        position: "top-right",
+        autoClose: 3000,
         theme: "dark",
       });
 
       navigate("/");
     } catch (err) {
       console.error("Signup error:", err);
-      alert(err.message);
+      toast.error("Signup failed: " + err.message, {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "dark",
+      });
     } finally {
       setLoading(false);
     }
@@ -60,10 +73,20 @@ export default function Signup() {
         { merge: true }
       );
 
+      toast.success("Signed up with Google ✅", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "dark",
+      });
+
       navigate("/");
     } catch (err) {
       console.error("Google sign-in error:", err);
-      alert("Google Sign-In failed: " + err.message);
+      toast.error("Google Sign-In failed: " + err.message, {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "dark",
+      });
     }
   };
 
@@ -148,6 +171,11 @@ export default function Signup() {
           <Link to="/login" className="text-blue-400 hover:underline">
             Log in
           </Link>
+        </p>
+
+        {/* Info Note */}
+        <p className="text-center text-xs mt-8 text-gray-500 italic">
+          If stuck on loading, refresh or navigate home — your account is already created ✅
         </p>
       </form>
     </div>

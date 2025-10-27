@@ -7,6 +7,7 @@ import {
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,9 +20,18 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast.success("Welcome back! 👋", {
+        position: "top-right",
+        autoClose: 2500,
+        theme: "dark",
+      });
       navigate("/");
     } catch (err) {
-      alert("Login failed: " + err.message);
+      toast.error("Login failed: " + err.message, {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "dark",
+      });
     } finally {
       setLoading(false);
     }
@@ -44,9 +54,18 @@ export default function Login() {
         { merge: true }
       );
 
+      toast.success("Signed in with Google ✅", {
+        position: "top-right",
+        autoClose: 2500,
+        theme: "dark",
+      });
       navigate("/");
     } catch (err) {
-      alert("Google Sign-In failed: " + err.message);
+      toast.error("Google Sign-In failed: " + err.message, {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "dark",
+      });
     }
   };
 
@@ -57,7 +76,7 @@ export default function Login() {
         className="bg-gray-900/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl w-full max-w-sm sm:max-w-md shadow-2xl border border-gray-800"
       >
         {/* Title */}
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-blue-400">
           Welcome Back 👋
         </h2>
 

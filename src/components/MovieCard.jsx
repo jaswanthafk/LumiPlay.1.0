@@ -7,6 +7,7 @@ import {
   isInWatchlist,
 } from "../utils/watchlist";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function MovieCard({ movie }) {
   const navigate = useNavigate();
@@ -21,23 +22,40 @@ export default function MovieCard({ movie }) {
     }
   }, [user, movie.id]);
 
-  const imageUrl =
-    movie.poster_path
-      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-      : movie.poster
-      ? `https://image.tmdb.org/t/p/w500${movie.poster}`
-      : "https://via.placeholder.com/300x450?text=No+Image";
+  const imageUrl = movie.poster_path
+    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+    : movie.poster
+    ? `https://image.tmdb.org/t/p/w500${movie.poster}`
+    : "https://via.placeholder.com/300x450?text=No+Image";
 
   const handleWatchlist = (e) => {
     e.stopPropagation();
-    if (!user) return alert("Please log in to use your Watchlist.");
+
+    if (!user) {
+      toast.warn("Please log in to use your Watchlist.", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "dark",
+      });
+      return;
+    }
 
     if (inWatchlist) {
       removeFromWatchlist(user, movie.id);
       setInWatchlist(false);
+      toast.info("Removed from your Watchlist.", {
+        position: "top-right",
+        autoClose: 2500,
+        theme: "dark",
+      });
     } else {
       addToWatchlist(user, movie);
       setInWatchlist(true);
+      toast.success("Added to your Watchlist ❤️", {
+        position: "top-right",
+        autoClose: 2500,
+        theme: "dark",
+      });
     }
   };
 
@@ -68,11 +86,7 @@ export default function MovieCard({ movie }) {
           className="absolute top-3 right-3 z-20 bg-black/60 p-2 rounded-full text-white hover:text-red-500 hover:bg-black/80 transition-all"
           title={inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
         >
-          {inWatchlist ? (
-            <FaHeart className="text-red-500" />
-          ) : (
-            <FaRegHeart />
-          )}
+          {inWatchlist ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
         </button>
 
         {/* Movie Info */}
