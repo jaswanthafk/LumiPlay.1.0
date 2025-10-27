@@ -36,7 +36,7 @@ export default function App() {
       }`}
     >
       <Navbar />
-      <AdWarning/>
+      <AdWarning />
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
