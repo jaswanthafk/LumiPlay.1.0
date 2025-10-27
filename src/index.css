@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* In index.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+/* Hide scrollbars but keep scroll functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+/* Prevent vertical scrolling inside movie rows */
+.no-vertical-scroll {
+  overscroll-behavior-y: contain;
+  overflow-y: hidden !important;
+  height: auto;
+}
+
+/* Hide scrollbars but keep functionality */
+.no-vertical-scroll::-webkit-scrollbar {
+  display: none;
+}
+/* Horizontal-only scroller: no vertical scroll, no rubber-banding to page */
+.row-scroller {
+  overflow-x: auto;
+  overflow-y: hidden !important;
+  white-space: nowrap; /* keep items on one line */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  touch-action: pan-x; /* <-- crucial: only allow horizontal gestures */
+}
+
+/* hide scrollbar but keep functionality */
+.row-scroller::-webkit-scrollbar {
+  display: none;
+}
+.row-scroller {
+  scrollbar-width: none;
+}
+
+/* while dragging, prevent text/image selection */
+.row-scroller.dragging,
+.row-scroller.dragging * {
+  user-select: none;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}
+body {
+  font-family: "Poppins", sans-serif;
+  color: #e5e7eb; /* Light gray text */
+}
