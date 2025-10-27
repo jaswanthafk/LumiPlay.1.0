@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { useAuth } from "../context/AuthContext";
 import { getWatchlist } from "../utils/watchlist";
 
-export default function TVShows() {
+export default function TvShows() {
   const pageRef = useRef();
   const { user } = useAuth();
   const [watchlist, setWatchlist] = useState([]);
