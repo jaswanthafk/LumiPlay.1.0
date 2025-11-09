@@ -1,7 +1,6 @@
 // src/pages/TVPage.jsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { gsap } from "gsap";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -9,133 +8,134 @@ export default function TVPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [show, setShow] = useState(null);
-  const [playerSrc, setPlayerSrc] = useState("");
-  const [isVidLink, setIsVidLink] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
-  const [loadingError, setLoadingError] = useState(false);
-  const pageRef = useRef(null);
+  const [seasonNum, setSeasonNum] = useState(1);
+  const [episodes, setEpisodes] = useState([]);
+  const [episodeNum, setEpisodeNum] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch TV show details
   useEffect(() => {
-    async function fetchShow() {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=en-US`
-      );
+    (async () => {
+      setLoading(true);
+      const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=en-US`);
       const data = await res.json();
       setShow(data);
-    }
-    fetchShow();
+
+      const s = (data.seasons || []).find((x) => x.season_number > 0) ?? { season_number: 1 };
+      setSeasonNum(s.season_number);
+
+      setLoading(false);
+    })();
   }, [id]);
 
-  // GSAP entrance animation
   useEffect(() => {
-    if (pageRef.current)
-      gsap.fromTo(pageRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8 });
-  }, [show]);
+    if (!seasonNum) return;
+    (async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${TMDB_KEY}&language=en-US`
+      );
+      const data = await res.json();
+      const eps = (data.episodes || []).filter((e) => e.episode_number > 0);
+      setEpisodes(eps);
+      setEpisodeNum(eps[0]?.episode_number || 1);
+    })();
+  }, [id, seasonNum]);
 
-  // Setup main player (VidLink) and fallback (VidKing)
-  useEffect(() => {
-    if (!show) return;
+  const seasons = useMemo(
+    () => (show?.seasons || []).filter((s) => s.season_number > 0),
+    [show]
+  );
 
-    const vidLinkURL = `https://vidlink.pro/tv/${show.id}/1/1`;
-    const vidKingURL = `https://www.vidking.net/embed/tv/${show.id}/1/1?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
+  const playerSrc = `https://vidlink.pro/tv/${id}/${seasonNum}/${episodeNum}`;
 
-    setPlayerSrc(vidLinkURL);
-    setIsVidLink(true);
-    setLoadingError(false);
+  if (loading || !show) {
+    return <div className="text-center mt-20 text-gray-400 text-lg">Loading…</div>;
+  }
 
-    const timeout = setTimeout(() => {
-      if (!loadingError && isVidLink) {
-        setPlayerSrc(vidKingURL);
-        setIsVidLink(false);
-      }
-    }, 8000);
-
-    return () => clearTimeout(timeout);
-  }, [show]);
-
-  // Manual player switch
-  const handlePlayerSwitch = () => {
-    if (!show) return;
-    if (isVidLink) {
-      setPlayerSrc(`https://www.vidking.net/embed/tv/${show.id}/1/1?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`);
-      setIsVidLink(false);
-    } else {
-      setPlayerSrc(`https://vidlink.pro/tv/${show.id}/1/1`);
-      setIsVidLink(true);
-    }
+  const goPrev = () => {
+    const idx = episodes.findIndex((e) => e.episode_number === episodeNum);
+    if (idx > 0) setEpisodeNum(episodes[idx - 1].episode_number);
   };
 
-  const handlePauseToggle = () => {
-    setIsPaused((prev) => !prev);
+  const goNext = () => {
+    const idx = episodes.findIndex((e) => e.episode_number === episodeNum);
+    if (idx < episodes.length - 1) setEpisodeNum(episodes[idx + 1].episode_number);
   };
-
-  if (!show) return <div className="text-center mt-20 text-gray-400">Loading...</div>;
 
   return (
-    <div ref={pageRef} className="relative bg-black text-white min-h-screen flex flex-col items-center mt-20">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold z-20 transition"
-      >
-        ← Back
-      </button>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-5xl mx-auto px-4 pt-24 pb-10">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-semibold transition"
+        >
+          ← Back
+        </button>
 
-      {/* Player */}
-      <div className="relative w-full max-w-7xl aspect-video mt-20 rounded-lg overflow-hidden shadow-2xl">
-        <iframe
-          src={playerSrc}
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          allowFullScreen
-          title={show.name}
-          className="w-full h-full"
-          onError={() => {
-            if (isVidLink) {
-              setPlayerSrc(`https://www.vidking.net/embed/tv/${show.id}/1/1?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`);
-              setIsVidLink(false);
-              setLoadingError(true);
-            }
-          }}
-        ></iframe>
+        <h1 className="text-3xl md:text-5xl font-bold mb-3 leading-tight">
+          {show.name}
+        </h1>
+        <p className="text-gray-300 text-sm md:text-base max-w-3xl mb-6">
+          {show.overview}
+        </p>
 
-        {/* Overlay when paused */}
-        {isPaused && (
-          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-center px-6">
-            <img
-              src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-              alt={show.name}
-              className="w-48 mb-4 rounded-lg shadow-lg"
-            />
-            <h1 className="text-3xl font-bold mb-2">{show.name}</h1>
-            <p className="max-w-xl text-gray-300 mb-4">{show.overview}</p>
-            <button
-              onClick={handlePauseToggle}
-              className="bg-blue-600 px-5 py-2 rounded font-semibold hover:bg-blue-500 transition"
+        {/* Season + Episode Controls */}
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-400 mb-1">Season</label>
+            <select
+              className="bg-gray-800 px-3 py-2 rounded-md text-white"
+              value={seasonNum}
+              onChange={(e) => setSeasonNum(Number(e.target.value))}
             >
-              ▶ Resume
+              {seasons.map((s) => (
+                <option key={s.id ?? s.season_number} value={s.season_number}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-400 mb-1">Episode</label>
+            <select
+              className="bg-gray-800 px-3 py-2 rounded-md text-white"
+              value={episodeNum}
+              onChange={(e) => setEpisodeNum(Number(e.target.value))}
+            >
+              {episodes.map((e) => (
+                <option key={e.id ?? e.episode_number} value={e.episode_number}>
+                  {e.episode_number}. {e.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex gap-2 ml-auto">
+            <button
+              onClick={goPrev}
+              className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-md transition"
+            >
+              ⟨ Prev
+            </button>
+            <button
+              onClick={goNext}
+              className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-md transition"
+            >
+              Next ⟩
             </button>
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Controls */}
-      <div className="flex gap-4 mt-6 mb-8">
-        <button
-          onClick={handlePauseToggle}
-          className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-sm font-semibold transition"
-        >
-          {isPaused ? "▶ Resume" : "❚❚ Pause"}
-        </button>
-
-        <button
-          onClick={handlePlayerSwitch}
-          className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-semibold transition"
-        >
-          Switch to {isVidLink ? "VidKing" : "VidLink"}
-        </button>
+        {/* Video Player */}
+        <div className="relative w-full aspect-video overflow-hidden rounded-xl shadow-2xl border border-gray-800">
+          <iframe
+            src={playerSrc}
+            allowFullScreen
+            frameBorder="0"
+            className="w-full h-full"
+            title={`${show.name} S${seasonNum}E${episodeNum}`}
+          />
+        </div>
       </div>
     </div>
   );

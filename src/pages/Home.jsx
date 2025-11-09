@@ -9,7 +9,8 @@ import { fetchWithCache } from "../utils/fetchWithCache";
 import { getWatchlist } from "../utils/watchlist";
 import { FiPlay, FiPause, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import "./Home.css";
-import SearchContainer from "../components/SearchContainer";
+import TVRow from "../components/TVRow";
+
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
 export default function Home() {
@@ -71,10 +72,6 @@ export default function Home() {
   };
 
   const currentMovie = heroMovies[currentHero];
-  <div className="w-full sm:w-[80%] md:w-[60%] lg:w-[50%] bg-gray-900/70 backdrop-blur-md p-3 rounded-full flex items-center shadow-lg">
-    {/* search input and icon */}
-    <SearchContainer />
-  </div>;
 
   // Load previous watches from localStorage
   useEffect(() => {
@@ -159,17 +156,14 @@ export default function Home() {
           </div>
         </section>
       )}
-      <div className="flex justify-center mt-6 sm:mt-10 px-4">
-        <div className="w-full sm:w-[80%] md:w-[60%] lg:w-[50%]">
-          <SearchContainer />
-        </div>
-      </div>
+
       {/* WATCHLIST */}
       {user && watchlist.length > 0 && (
         <div className="mt-8 sm:mt-10">
           <MovieRow title="Your Watchlist ❤️" customList={watchlist} />
         </div>
       )}
+
       {/* PREVIOUS WATCHES */}
       {user && previousWatches.length > 0 && (
         <div className="mt-6 sm:mt-8">
@@ -179,14 +173,25 @@ export default function Home() {
           />
         </div>
       )}
+
       {/* RECOMMENDATIONS (component handles its own fetching/caching) */}
       <Recommendations />
-      {/* STANDARD TMDB ROWS */}
-      <MovieRow title="Popular on LumiPlay" endpoint="/movie/popular" />
-      <MovieRow title="Top Rated" endpoint="/movie/top_rated" />
-      <MovieRow title="Upcoming" endpoint="/movie/upcoming" />
+
+      {/* Mixed Movies & TV Sections */}
+      <MovieRow title="Popular Movies" endpoint="/movie/popular" />
+      <TVRow title="Popular TV" endpoint="/tv/popular" />
+
+      <MovieRow title="Top Rated Movies" endpoint="/movie/top_rated" />
+      <TVRow title="Top Rated TV Shows" endpoint="/tv/top_rated" />
+
+      <MovieRow title="Trending Movies" endpoint="/trending/movie/week" />
+      <TVRow title="Trending TV Shows" endpoint="/trending/tv/week" />
+
       <MovieRow title="Now Playing" endpoint="/movie/now_playing" />
-      <MovieRow title="Trending" endpoint="/trending/movie/week" />
+      <TVRow title="Airing Today" endpoint="/tv/airing_today" />
+
+      <MovieRow title="Upcoming Movies" endpoint="/movie/upcoming" />
+      <TVRow title="On The Air" endpoint="/tv/on_the_air" />
     </div>
   );
 }

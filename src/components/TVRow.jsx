@@ -25,7 +25,10 @@ export default function TVRow({ title, endpoint }) {
     const el = rowRef.current;
     if (!el) return;
     const amount = el.clientWidth * 0.9;
-    el.scrollTo({ left: el.scrollLeft + (dir === "left" ? -amount : amount), behavior: "smooth" });
+    el.scrollTo({
+      left: el.scrollLeft + (dir === "left" ? -amount : amount),
+      behavior: "smooth",
+    });
   };
 
   const onWheel = (e) => {
@@ -80,44 +83,52 @@ export default function TVRow({ title, endpoint }) {
         <FaChevronLeft />
       </button>
 
-<div
-  ref={rowRef}
-  className="flex gap-3 overflow-x-auto overflow-y-hidden px-4 pb-2 scroll-smooth no-vertical-scroll"
-  style={{
-    scrollSnapType: "x mandatory",
-    WebkitOverflowScrolling: "touch",
-    scrollbarWidth: "none",
-  }}
-  onWheel={onWheel}
-  onMouseDown={onMouseDown}
-  onMouseLeave={onMouseLeave}
-  onMouseUp={onMouseUp}
-  onMouseMove={onMouseMove}
-  onTouchStart={onTouchStart}
-  onTouchMove={onTouchMove}
->
-
+      <div
+        ref={rowRef}
+        className="flex gap-3 overflow-x-auto overflow-y-hidden px-4 pb-2 scroll-smooth no-vertical-scroll"
+        style={{
+          scrollSnapType: "x mandatory",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+        }}
+        onWheel={onWheel}
+        onMouseDown={onMouseDown}
+        onMouseLeave={onMouseLeave}
+        onMouseUp={onMouseUp}
+        onMouseMove={onMouseMove}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+      >
         {shows.map((show) => (
           <div
             key={show.id}
             style={{ scrollSnapAlign: "start" }}
-            className="shrink-0 min-w-[160px] cursor-pointer relative group"
+            className="shrink-0 min-w-[180px] cursor-pointer relative transition-all duration-500 hover:scale-[1.07] hover:z-20"
             onClick={() => navigate(`/tv/${show.id}`)}
           >
-            <img
-              src={
-                show.poster_path
-                  ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-                  : "https://via.placeholder.com/300x450?text=No+Image"
-              }
-              alt={show.name}
-              className="rounded-lg w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
-              <h3 className="text-base font-semibold">{show.name}</h3>
-              <p className="text-xs text-gray-300">
-                {show.first_air_date?.slice(0, 4) || "N/A"} • {(show.vote_average || 0).toFixed(1)} ★
-              </p>
+            {/* Poster Container */}
+            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+              <img
+                src={
+                  show.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
+                    : "https://via.placeholder.com/300x450?text=No+Image"
+                }
+                alt={show.name}
+                className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+
+              {/* Smooth Gradient Overlay + Info */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-3 flex flex-col justify-end">
+                <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2">
+                  {show.name}
+                </h3>
+
+                <p className="text-xs text-gray-300">
+                  {show.first_air_date?.slice(0, 4) || "N/A"} •{" "}
+                  {(show.vote_average || 0).toFixed(1)} ★
+                </p>
+              </div>
             </div>
           </div>
         ))}
