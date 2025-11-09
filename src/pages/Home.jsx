@@ -10,6 +10,7 @@ import { getWatchlist } from "../utils/watchlist";
 import { FiPlay, FiPause, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import "./Home.css";
 import TVRow from "../components/TVRow";
+import SearchContainer from "../components/SearchContainer";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 
@@ -156,6 +157,9 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Search*/}
+      <SearchContainer />
 
       {/* WATCHLIST */}
       {user && watchlist.length > 0 && (
